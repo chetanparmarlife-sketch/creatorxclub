@@ -1,0 +1,16 @@
+{
+  "name": "creatorxclub",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test"
+  },
+  "devDependencies": {
+    "turbo": "^2.6.1",
+    "typescript": "^5.6.3"
+  }
+}
