@@ -1,0 +1,7 @@
+package com.creatorx.domain.brand;
+
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BrandTeamMemberRepository extends JpaRepository<BrandTeamMember, UUID> {
+}

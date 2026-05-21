@@ -1,291 +1,297 @@
-export type UserType = "creator" | "brand" | "admin";
-export type UserStatus = "active" | "suspended" | "pending_deletion";
-export type Platform = "instagram" | "youtube" | "tiktok";
-export type KycStatus = "pending" | "approved" | "rejected";
-export type BrandVerificationStatus = "pending" | "approved" | "rejected";
-export type BrandRole = "owner" | "manager" | "viewer";
-export type InvitationStatus = "pending" | "accepted";
-export type CompensationType = "cash" | "gifting" | "digital" | "mixed";
-export type CampaignStatus = "draft" | "pending_moderation" | "live" | "paused" | "completed" | "cancelled";
-export type ApplicationStatus = "pending" | "shortlisted" | "approved" | "rejected" | "countered";
-export type DeliverableStatus = "pending_review" | "revision_requested" | "approved" | "rejected";
-export type ContractStatus = "pending" | "completed";
-export type TransactionType = "deposit" | "escrow_lock" | "escrow_release" | "withdrawal" | "fee" | "refund" | "referral_credit";
-export type TransactionStatus = "pending" | "completed" | "failed" | "reversed";
-export type ChatFlagStatus = "none" | "user_flagged" | "auto_flagged";
-export type DisputeReason = "quality_issue" | "non_payment" | "contract_breach" | "non_compliance" | "other";
-export type DisputeStatus = "open" | "under_review" | "resolved_creator" | "resolved_brand";
-export type EventOrganizerType = "creator" | "admin";
-export type EventType = "virtual" | "physical";
-export type SponsorshipStatus = "unsponsored" | "pending" | "sponsored";
-export type EventRegistrationStatus = "registered" | "attended" | "cancelled";
-export type EventSponsorshipState = "pending" | "active" | "completed";
-export type NotificationType =
-  | "kyc_status"
-  | "application_status"
-  | "deliverable_status"
-  | "payment_received"
-  | "chat_message"
-  | "dispute_update"
-  | "event_reminder"
-  | "campaign_moderation";
-export type ReferralStatus = "pending" | "completed";
+export type UUID = string;
+export type ISODateTime = string;
+export type JsonString = string;
 
-export interface Timestamped {
-  createdAt: string;
-  updatedAt?: string;
-}
+export type UserType = "CREATOR" | "BRAND" | "ADMIN";
+export type UserStatus = "ACTIVE" | "SUSPENDED" | "PENDING_DELETION";
+export type Platform = "INSTAGRAM" | "YOUTUBE" | "TIKTOK";
+export type KycStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type BrandVerificationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type BrandTeamRole = "OWNER" | "MANAGER" | "VIEWER";
+export type InvitationStatus = "PENDING" | "ACCEPTED";
+export type CompensationType = "CASH" | "GIFTING" | "DIGITAL" | "MIXED";
+export type CampaignStatus = "DRAFT" | "PENDING_MODERATION" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED";
+export type ApplicationStatus = "PENDING" | "SHORTLISTED" | "APPROVED" | "REJECTED" | "COUNTERED";
+export type DeliverableStatus = "PENDING_REVIEW" | "REVISION_REQUESTED" | "APPROVED" | "REJECTED";
+export type DigitalContractStatus = "PENDING" | "COMPLETED";
+export type TransactionType =
+  | "ESCROW_LOCK"
+  | "ESCROW_RELEASE"
+  | "CREATOR_WITHDRAWAL"
+  | "BRAND_DEPOSIT"
+  | "PLATFORM_FEE"
+  | "REFUND"
+  | "REFERRAL_CREDIT";
+export type TransactionStatus = "PENDING" | "COMPLETED" | "FAILED";
+export type ChatFlagStatus = "NONE" | "USER_FLAGGED" | "AUTO_FLAGGED";
+export type DisputeReason = "QUALITY_ISSUE" | "NON_PAYMENT" | "CONTRACT_BREACH" | "NON_COMPLIANCE" | "OTHER";
+export type DisputeStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED";
+export type DisputeResolution = "RELEASED_TO_CREATOR" | "REFUNDED_TO_BRAND";
+export type EventType = "VIRTUAL" | "PHYSICAL";
+export type EventSponsorshipStatus = "PENDING" | "COMPLETED";
+export type NotificationType = "CAMPAIGN" | "PAYMENT" | "SYSTEM" | "CHAT";
+export type ReferralStatus = "PENDING" | "COMPLETED";
 
-export interface User extends Timestamped {
-  id: string;
+export interface User {
+  id: UUID;
   email: string;
-  phoneNumber?: string;
-  passwordHash?: string;
+  phoneNumber?: string | null;
+  passwordHash?: string | null;
   userType: UserType;
   status: UserStatus;
-  notificationPreferences?: Record<string, unknown>;
+  notificationPrefs: JsonString;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface CreatorProfile {
-  userId: string;
+  userId: UUID;
   displayName: string;
-  bio?: string;
-  nicheCategories: string[];
-  primaryPlatform?: Platform;
-  targetBudgetRange?: {
-    min: number;
-    max: number;
-  };
-  audienceDemographics?: Record<string, unknown>;
-  followerCount?: number;
-  engagementRate?: number;
+  bio?: string | null;
+  nicheCategories: JsonString;
+  primaryPlatform?: Platform | null;
+  targetBudgetMin?: number | null;
+  targetBudgetMax?: number | null;
+  audienceDemographics: JsonString;
+  followerCount: number;
+  engagementRate: number;
   kycStatus: KycStatus;
-  kycDocuments?: {
-    idFrontUrl?: string;
-    idBackUrl?: string;
-    selfieUrl?: string;
-  };
+  kycDocuments: JsonString;
   referralCode: string;
   availableBalance: number;
+  productReceiptConfirmed: boolean;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface SocialAccount {
-  id: string;
-  creatorId: string;
+  id: UUID;
+  creatorId: UUID;
   platform: Platform;
-  handle?: string;
+  accessToken?: string | null;
   followerCount: number;
   engagementRate: number;
-  syncedAt: string;
+  syncedAt: ISODateTime;
 }
 
 export interface Brand {
-  userId: string;
+  userId: UUID;
   companyName: string;
   taxId: string;
-  gstDocuments?: string[];
+  gstDocuments: JsonString;
   verificationStatus: BrandVerificationStatus;
   walletBalance: number;
   escrowAllocated: number;
   totalSpent: number;
+  version: number;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface BrandTeamMember {
-  id: string;
-  brandId: string;
-  userId?: string;
+  id: UUID;
+  brandId: UUID;
+  userId?: UUID | null;
   email: string;
-  role: BrandRole;
+  role: BrandTeamRole;
   invitationStatus: InvitationStatus;
-  createdAt: string;
+  createdAt: ISODateTime;
 }
 
-export interface Campaign extends Timestamped {
-  id: string;
-  brandId: string;
+export interface Campaign {
+  id: UUID;
+  brandId: UUID;
   title: string;
   description: string;
-  nicheCategories: string[];
-  targetPlatforms: Platform[];
-  deliverableRequirements: Record<string, unknown>;
-  slaTerms: string;
-  usageRights: Record<string, unknown>;
+  nicheCategories: JsonString;
+  targetPlatforms: JsonString;
+  deliverableRequirements: JsonString;
+  slaTerms?: string | null;
+  usageRights: JsonString;
   compensationType: CompensationType;
   totalBudget: number;
   creatorPayout: number;
-  fixedServiceFee?: number;
+  fixedServiceFee: number;
   negotiationEnabled: boolean;
   status: CampaignStatus;
   escrowLocked: boolean;
-  inventoryItems?: Array<{
-    inventoryItemId: string;
-    quantity: number;
-  }>;
+  inventoryItems: JsonString;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface InventoryItem {
-  id: string;
-  brandId: string;
+  id: UUID;
+  brandId: UUID;
   productName: string;
-  description?: string;
+  description?: string | null;
   value: number;
   stockCount: number;
-  sku?: string;
-  images: string[];
+  sku?: string | null;
+  images: JsonString;
   isActive: boolean;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
-export interface Application extends Timestamped {
-  id: string;
-  campaignId: string;
-  creatorId: string;
+export interface Application {
+  id: UUID;
+  campaignId: UUID;
+  creatorId: UUID;
   pitchMessage: string;
-  proposedPrice?: number;
-  portfolioLinks?: string[];
+  proposedPrice?: number | null;
+  portfolioLinks: JsonString;
   status: ApplicationStatus;
-  brandFeedback?: string;
-  counterOfferAmount?: number;
+  brandFeedback?: string | null;
+  counterOfferAmount?: number | null;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface Deliverable {
-  id: string;
-  applicationId: string;
-  campaignId: string;
-  creatorId: string;
-  contentFiles: string[];
-  captions?: string;
-  hashtags?: string[];
-  postingInstructions?: string;
-  submittedAt?: string;
+  id: UUID;
+  applicationId: UUID;
+  campaignId: UUID;
+  creatorId: UUID;
+  contentFiles: JsonString;
+  captions?: string | null;
+  hashtags: JsonString;
+  postingInstructions?: string | null;
+  submittedAt?: ISODateTime | null;
   status: DeliverableStatus;
-  revisionNotes?: string;
-  slaDeadline: string;
+  revisionNotes?: string | null;
+  slaDeadline: ISODateTime;
+  productReceiptConfirmed: boolean;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface DigitalContract {
-  id: string;
-  campaignId: string;
-  deliverableId: string;
-  usageRightsSnapshot: Record<string, unknown>;
-  creatorSignature?: string;
-  brandSignature?: string;
-  creatorSignedAt?: string;
-  brandSignedAt?: string;
-  status: ContractStatus;
+  id: UUID;
+  campaignId: UUID;
+  deliverableId: UUID;
+  usageRightsSnapshot: JsonString;
+  creatorSignature?: string | null;
+  brandSignature?: string | null;
+  creatorSignedAt?: ISODateTime | null;
+  brandSignedAt?: ISODateTime | null;
+  status: DigitalContractStatus;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface Transaction {
-  id: string;
-  userId: string;
+  id: UUID;
   type: TransactionType;
+  fromUserId?: UUID | null;
+  toUserId?: UUID | null;
   amount: number;
   platformFee: number;
-  currency: string;
+  netAmount: number;
+  idempotencyKey?: string | null;
+  razorpayRef?: string | null;
+  campaignId?: UUID | null;
   status: TransactionStatus;
-  razorpayId?: string;
-  idempotencyKey?: string;
-  metadata?: Record<string, unknown>;
-  createdAt: string;
+  createdAt: ISODateTime;
 }
 
 export interface ChatThread {
-  id: string;
-  campaignId: string;
-  participants: string[];
-  createdAt: string;
-  lastMessageAt?: string;
-  isEscalated: boolean;
+  id: UUID;
+  campaignId: UUID;
+  creatorId: UUID;
+  brandId: UUID;
   adminJoined: boolean;
-  sentimentAlert: boolean;
+  flagStatus: ChatFlagStatus;
+  sentimentScore: number;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface ChatMessage {
-  id: string;
-  threadId: string;
-  senderId: string;
+  id: UUID;
+  threadId: UUID;
+  senderId: UUID;
   content: string;
-  attachments?: string[];
-  sentimentScore?: number;
-  flagStatus: ChatFlagStatus;
-  createdAt: string;
+  isAdminMessage: boolean;
+  attachments: JsonString;
+  readAt?: ISODateTime | null;
+  createdAt: ISODateTime;
 }
 
 export interface DisputeCase {
-  id: string;
-  campaignId: string;
-  deliverableId?: string;
-  raisedById: string;
+  id: UUID;
+  campaignId: UUID;
+  raisedByUserId: UUID;
   reason: DisputeReason;
-  description: string;
-  evidenceFiles?: string[];
+  evidence: JsonString;
   status: DisputeStatus;
-  resolutionNotes?: string;
-  adminId?: string;
-  createdAt: string;
-  resolvedAt?: string;
+  adminNotes?: string | null;
+  resolution?: DisputeResolution | null;
+  resolvedAt?: ISODateTime | null;
+  createdAt: ISODateTime;
 }
 
 export interface CommunityPost {
-  id: string;
-  authorId: string;
+  id: UUID;
+  authorId: UUID;
   content: string;
-  mediaUrls?: string[];
-  likesCount: number;
-  commentsCount: number;
-  isPinned: boolean;
-  createdAt: string;
+  mediaAttachments: JsonString;
+  likeCount: number;
+  commentCount: number;
+  createdAt: ISODateTime;
+  updatedAt: ISODateTime;
 }
 
 export interface Event {
-  id: string;
+  id: UUID;
+  organizerId: UUID;
   title: string;
-  description: string;
-  organizerType: EventOrganizerType;
-  organizerId: string;
+  description?: string | null;
   eventType: EventType;
+  startAt: ISODateTime;
   location: string;
-  startDateTime: string;
-  endDateTime: string;
   capacity: number;
   registrationCount: number;
-  sponsorshipStatus: SponsorshipStatus;
-  createdAt: string;
+  sponsoredByBrandId?: UUID | null;
+  createdAt: ISODateTime;
 }
 
 export interface EventRegistration {
-  id: string;
-  eventId: string;
-  creatorId: string;
-  status: EventRegistrationStatus;
-  registeredAt: string;
+  id: UUID;
+  eventId: UUID;
+  creatorId: UUID;
+  registeredAt: ISODateTime;
+  reminderSent: boolean;
 }
 
 export interface EventSponsorship {
-  id: string;
-  eventId: string;
-  brandId: string;
+  id: UUID;
+  eventId: UUID;
+  brandId: UUID;
   amount: number;
-  tier?: string;
-  status: EventSponsorshipState;
-  createdAt: string;
+  tier?: string | null;
+  razorpayRef?: string | null;
+  status: EventSponsorshipStatus;
+  createdAt: ISODateTime;
 }
 
 export interface Notification {
-  id: string;
-  userId: string;
+  id: UUID;
+  userId: UUID;
   type: NotificationType;
   title: string;
-  body: string;
-  dataPayload?: Record<string, unknown>;
+  message: string;
+  deepLink?: string | null;
   isRead: boolean;
-  createdAt: string;
+  createdAt: ISODateTime;
 }
 
 export interface ReferralRecord {
-  id: string;
-  referrerId: string;
-  refereeId: string;
+  id: UUID;
+  referrerId: UUID;
+  refereeId: UUID;
   status: ReferralStatus;
   rewardAmount: number;
-  creditedAt?: string;
+  creditedAt?: ISODateTime | null;
+  createdAt: ISODateTime;
 }
