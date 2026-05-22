@@ -21,9 +21,8 @@ export default function OnboardingLayout() {
         <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={18} color={colors.textPrimary} />
         </Pressable>
-        <ProgressDots steps={steps} currentIndex={currentIndex} />
-        <View style={styles.spacer} />
       </View>
+      <ProgressDots steps={steps} currentIndex={currentIndex} />
       <View style={styles.content}>
         <Slot />
       </View>
@@ -35,7 +34,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    marginBottom: 18
   },
   backButton: {
     width: 40,
@@ -47,11 +47,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  spacer: {
-    width: 40
-  },
   content: {
     flex: 1,
-    justifyContent: "center"
+    paddingTop: 22
   }
 });
