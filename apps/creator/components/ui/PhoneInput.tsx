@@ -1,25 +1,37 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { colors } from "@/lib/theme";
 
 type PhoneInputProps = {
   countryCode?: string;
+  countryLabel?: string;
   value: string;
   onChangeText: (value: string) => void;
   error?: string;
+  placeholder?: string;
+  onCountryPress?: () => void;
 };
 
-export function PhoneInput({ countryCode = "+91", value, onChangeText, error }: PhoneInputProps) {
+export function PhoneInput({
+  countryCode = "+91",
+  countryLabel,
+  value,
+  onChangeText,
+  error,
+  placeholder = "98765 43210",
+  onCountryPress
+}: PhoneInputProps) {
   return (
     <View style={styles.wrapper}>
       <View style={[styles.inputShell, error ? styles.errorBorder : null]}>
-        <View style={styles.countryCode}>
-          <Text style={styles.countryText}>{countryCode}</Text>
-        </View>
+        <Pressable accessibilityRole="button" onPress={onCountryPress} style={styles.countryCode}>
+          <Text style={styles.countryText}>{countryLabel ?? countryCode}</Text>
+          <Text style={styles.chevron}>⌄</Text>
+        </Pressable>
         <TextInput
           value={value}
           onChangeText={onChangeText}
           keyboardType="phone-pad"
-          placeholder="98765 43210"
+          placeholder={placeholder}
           placeholderTextColor={colors.textMuted}
           style={styles.input}
         />
@@ -46,15 +58,26 @@ const styles = StyleSheet.create({
   },
   countryCode: {
     height: "100%",
+    minHeight: 58,
     paddingHorizontal: 16,
+    alignItems: "center",
     justifyContent: "center",
+    flexDirection: "row",
+    gap: 8,
+    backgroundColor: colors.background,
     borderRightWidth: 1,
-    borderRightColor: colors.borderSoft
+    borderRightColor: "#D4D0E0"
   },
   countryText: {
     color: colors.textPrimary,
     fontSize: 15,
     fontWeight: "700"
+  },
+  chevron: {
+    color: colors.textMuted,
+    fontSize: 16,
+    fontWeight: "700",
+    marginTop: -4
   },
   input: {
     flex: 1,

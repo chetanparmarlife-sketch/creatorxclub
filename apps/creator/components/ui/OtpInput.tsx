@@ -1,16 +1,37 @@
-import { useRef } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, StyleSheet, TextInput, View } from "react-native";
 import { colors } from "@/lib/theme";
 
 type OtpInputProps = {
   value: string;
   onChange: (value: string) => void;
   hasError?: boolean;
+  autoFocus?: boolean;
+  shakeKey?: number;
 };
 
-export function OtpInput({ value, onChange, hasError }: OtpInputProps) {
+export function OtpInput({ value, onChange, hasError, autoFocus, shakeKey }: OtpInputProps) {
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const shake = useRef(new Animated.Value(0)).current;
   const digits = Array.from({ length: 6 }, (_, index) => value[index] ?? "");
+
+  useEffect(() => {
+    if (autoFocus) {
+      const timer = setTimeout(() => inputRefs.current[0]?.focus(), 250);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [autoFocus]);
+
+  useEffect(() => {
+    if (!shakeKey) return;
+    Animated.sequence([
+      Animated.timing(shake, { toValue: -6, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 6, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: -4, duration: 55, useNativeDriver: true }),
+      Animated.timing(shake, { toValue: 0, duration: 55, useNativeDriver: true })
+    ]).start();
+  }, [shake, shakeKey]);
 
   const updateDigit = (text: string, index: number) => {
     const numeric = text.replace(/\D/g, "");
@@ -29,7 +50,7 @@ export function OtpInput({ value, onChange, hasError }: OtpInputProps) {
   };
 
   return (
-    <View style={styles.row}>
+    <Animated.View style={[styles.row, { transform: [{ translateX: shake }] }]}>
       {digits.map((digit, index) => (
         <TextInput
           key={index}
@@ -50,7 +71,7 @@ export function OtpInput({ value, onChange, hasError }: OtpInputProps) {
           style={[styles.box, digit ? styles.filled : null, hasError ? styles.error : null]}
         />
       ))}
-    </View>
+    </Animated.View>
   );
 }
 
