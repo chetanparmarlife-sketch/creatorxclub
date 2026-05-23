@@ -1,7 +1,23 @@
 # CreatorX — Implementation Plan
 # Spec: Mowgli SPEC.md v16
 # Backend: Java 21 + Spring Boot 3.x
-# Last updated: 2026-05-22
+# Last updated: 2026-05-23
+
+## Current Status
+✅ Phase 1 — Foundation (Complete)
+✅ Phase 2 — Creator Onboarding (Complete)
+✅ Phase 3 — Campaign Discovery & Application (Complete)
+🔄 Phase 4 — Active Campaign Management (Next)
+⏳ Phase 5 — Wallet, Chat & Community
+⏳ Phase 6 — Brand Portal
+⏳ Phase 7 — Admin Dashboard
+⏳ Phase 8 — Cross-cutting Concerns
+⏳ Phase 9 — Testing
+⏳ Phase 10 — Deployment
+
+Last updated: 2026-05-23
+Backend: Java 21 + Spring Boot 3.3
+Database: Supabase PostgreSQL — 17 migrations applied
 
 ---
 
@@ -402,6 +418,32 @@ CREATOR_APP_SCHEME=creatorx://
 
 ---
 
+### 3.4 Backend Campaign and Application Endpoints
+- [x] `GET /api/campaigns` — Creator campaign discovery with filters, pagination, AI match score, saved state, and creator net payout
+- [x] `GET /api/campaigns/{id}` — campaign detail with Brand profile, usage rights, deliverables, inventory, and creator payout breakdown
+- [x] `GET /api/campaigns/{id}/my-application` — current Creator application lookup for already-applied state
+- [x] `POST /api/creators/saved-campaigns/{campaignId}` — save campaign
+- [x] `DELETE /api/creators/saved-campaigns/{campaignId}` — unsave campaign
+- [x] `GET /api/creators/saved-campaigns` — list saved campaign IDs
+- [x] `POST /api/campaigns/{id}/applications` — submit campaign application with KYC and business-rule validation
+- [x] `GET /api/creators/applications` — list Creator applications with optional status filter
+
+---
+
+## Known Issues & Tech Debt
+
+- [ ] Glassmorphic theme not fully consistent — white surfaces still present in some onboarding screens (fixed in cleanup)
+- [ ] Campaign JSONB filtering uses LIKE — replaced with @> operator (fixed in cleanup)
+- [ ] Explore pagination was 1-based — fixed to 0-based (fixed in cleanup)
+- [ ] useSaveCampaign always POSTed — fixed to POST/DELETE toggle (fixed in cleanup)
+- [ ] FCM push not implemented — added fcm-token endpoint + Firebase send (fixed in cleanup)
+- [ ] Brand stats (rating, avg payout) are real queries now but rating data will be empty until deliverable rating system is built in Phase 4
+- [ ] WebSocket chat is a ping stub — real implementation in Phase 5
+- [ ] Brand portal and Admin dashboard are scaffolds only — Phase 6 + 7
+- [ ] No E2E tests yet — Detox setup deferred to Phase 9
+
+---
+
 ## Phase 4 — Creator App: Active Campaign Management
 
 > Design reference: ActiveCampaignsListScreen.tsx, ActiveCampaignDetailScreen.tsx, DeliverableUploadInterfaceScreen.tsx
@@ -682,3 +724,25 @@ CREATOR_APP_SCHEME=creatorx://
 | DisputeResolution | DisputeResolutionScreen.tsx | Admin |
 | FinancialLedger | FinancialLedgerScreen.tsx | Admin |
 | ComplianceManagement | ComplianceManagementScreen.tsx | Admin |
+
+---
+
+## Session Log
+
+### Session 1 — Phase 1 Foundation
+Completed monorepo, Spring Boot, 20 JPA entities, Flyway migrations,
+JWT auth layer, shared types package.
+
+### Session 2 — Phase 2 Creator Onboarding
+Completed auth screens, onboarding wizard, backend onboarding endpoints.
+Supabase phone auth integrated. KYC document upload to Supabase Storage.
+
+### Session 3 — Phase 3 Campaign Discovery
+Completed explore feed, campaign detail, application composer.
+AI match scoring with Redis cache. KYC gate enforced on frontend + backend.
+Application validation with 6 business rules.
+
+### Cleanup Session — Foundation Fixes
+Fixed pagination bug, save/unsave toggle, glassmorphic theme,
+JSONB filtering, FCM token endpoint, brand stats queries.
+All Phase 1–3 tasks marked complete.
