@@ -72,6 +72,9 @@ public class CreatorProfile {
     @Column(name = "product_receipt_confirmed", nullable = false)
     private Boolean productReceiptConfirmed;
 
+    @Column(name = "shipping_address", columnDefinition = "jsonb")
+    private String shippingAddress;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

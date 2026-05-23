@@ -60,6 +60,7 @@ export interface CreatorProfile {
   referralCode: string;
   availableBalance: number;
   productReceiptConfirmed: boolean;
+  shippingAddress?: JsonString | null;
   createdAt: ISODateTime;
   updatedAt: ISODateTime;
 }

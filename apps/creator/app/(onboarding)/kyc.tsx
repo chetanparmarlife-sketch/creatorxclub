@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { useSubmitKyc } from "@/lib/hooks/useOnboardingMutations";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient, supabaseUrl } from "@/lib/supabase";
 import { colors } from "@/lib/theme";
 import { useAuthStore } from "@/store/auth";
 import { KycAsset, useOnboardingStore } from "@/store/onboarding";
@@ -186,6 +186,7 @@ function toAsset(asset: ImagePicker.ImagePickerAsset, key: KycKey): KycAsset {
 }
 
 async function uploadKycAsset(asset: KycAsset, path: string) {
+  const supabase = getSupabaseClient();
   const response = await fetch(asset.uri);
   const blob = await response.blob();
   const { data, error } = await supabase.storage.from("kyc-documents").upload(path, blob, {
@@ -193,7 +194,7 @@ async function uploadKycAsset(asset: KycAsset, path: string) {
     upsert: true
   });
   if (error) throw error;
-  return data.path;
+  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/kyc-documents/${data.path}`;
 }
 
 const styles = StyleSheet.create({
