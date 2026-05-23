@@ -136,7 +136,7 @@ export default function ExploreRoute() {
             campaign={item}
             kycStatus={kycStatus}
             onPress={() => openDetail(item)}
-            onSave={() => saveCampaign.mutate(item.id)}
+            onSave={() => saveCampaign.mutate({ campaignId: item.id, isSaved: item.saved })}
             onApply={() => openApply(item)}
             onKycRequired={() => setKycModalOpen(true)}
           />
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.06)",
     shadowColor: colors.primary,
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.06)",
     paddingHorizontal: 14,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   kycSheet: {
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 22,
     paddingTop: 12,
     paddingBottom: 30

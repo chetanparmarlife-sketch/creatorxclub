@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.06)",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: colors.primary,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     maxHeight: "78%",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 30

@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     maxHeight: "88%",
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingTop: 12
   },
   handle: {
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     borderRadius: 18,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: 13,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 6
   },
   optionCardSelected: {
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 7,
     borderRadius: 13,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: 13
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   compChip: {
     borderRadius: 18,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     paddingHorizontal: 14,

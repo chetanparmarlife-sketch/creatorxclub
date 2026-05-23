@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     flexDirection: "row",
     alignItems: "center",
     overflow: "hidden"

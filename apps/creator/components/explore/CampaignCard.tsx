@@ -145,9 +145,9 @@ function formatCurrency(value: number) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.06)",
+    borderColor: colors.borderGlass,
     padding: 16,
     shadowColor: colors.primary,
     shadowOpacity: 0.06,
@@ -167,9 +167,9 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.06)"
+    borderColor: colors.borderGlass
   },
   topRow: {
     flexDirection: "row",
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     overflow: "hidden"
   },
   avatarImage: {
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   },
   categoryTag: {
     borderRadius: 14,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 10,
     paddingVertical: 6
   },

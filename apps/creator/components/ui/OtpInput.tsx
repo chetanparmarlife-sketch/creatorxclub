@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.borderSoft,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     color: colors.textPrimary,
     textAlign: "center",
     fontSize: 20,

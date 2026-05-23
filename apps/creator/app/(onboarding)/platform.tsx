@@ -199,8 +199,8 @@ const styles = StyleSheet.create({
     minHeight: 112,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.08)",
-    backgroundColor: "#FFFFFF",
+    borderColor: colors.borderGlass,
+    backgroundColor: colors.surfaceSolid,
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     marginRight: 15
   },
   platformIconSelected: {
@@ -251,8 +251,8 @@ const styles = StyleSheet.create({
   budgetCard: {
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.06)",
-    backgroundColor: "#FFFFFF",
+    borderColor: colors.borderGlass,
+    backgroundColor: colors.surfaceSolid,
     padding: 18,
     shadowColor: colors.primary,
     shadowOpacity: 0.06,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSoft,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 14
   },
   rupee: {
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 14,
     paddingVertical: 10
   },

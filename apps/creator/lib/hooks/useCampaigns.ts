@@ -33,6 +33,7 @@ export type CampaignPage = {
   page: number;
   totalPages: number;
   total: number | null;
+  last: boolean;
 };
 
 type SaveContext = {
@@ -44,7 +45,7 @@ const PAGE_SIZE = 10;
 export function useExploreCampaigns(filters: ExploreFilters) {
   const query = useInfiniteQuery({
     queryKey: ["explore-campaigns", filters],
-    initialPageParam: 1,
+    initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
       const params = {
         category: filters.category.length ? filters.category.join(",") : undefined,
@@ -59,7 +60,7 @@ export function useExploreCampaigns(filters: ExploreFilters) {
       const { data } = await api.get("/api/campaigns", { params });
       return normalizeCampaignPage(data, Number(pageParam));
     },
-    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined)
+    getNextPageParam: (lastPage, pages) => (lastPage.last ? undefined : pages.length)
   });
 
   return {
@@ -74,11 +75,15 @@ export function useExploreCampaigns(filters: ExploreFilters) {
 export function useSaveCampaign() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, string, SaveContext>({
-    mutationFn: async (campaignId) => {
-      await api.post(`/api/creators/saved-campaigns/${campaignId}`);
+  return useMutation<void, Error, { campaignId: string; isSaved: boolean }, SaveContext>({
+    mutationFn: async ({ campaignId, isSaved }) => {
+      if (isSaved) {
+        await api.delete(`/api/creators/saved-campaigns/${campaignId}`);
+      } else {
+        await api.post(`/api/creators/saved-campaigns/${campaignId}`);
+      }
     },
-    onMutate: async (campaignId) => {
+    onMutate: async ({ campaignId }) => {
       await queryClient.cancelQueries({ queryKey: ["explore-campaigns"] });
       const previous = queryClient
         .getQueriesData<InfiniteData<CampaignPage>>({ queryKey: ["explore-campaigns"] })
@@ -115,12 +120,14 @@ function normalizeCampaignPage(payload: any, fallbackPage: number): CampaignPage
   const page = Number(payload?.page ?? payload?.number ?? fallbackPage);
   const totalPages = Number(payload?.totalPages ?? payload?.pageCount ?? (payload?.hasNext ? page + 1 : page));
   const total = typeof payload?.total === "number" ? payload.total : typeof payload?.totalElements === "number" ? payload.totalElements : null;
+  const last = typeof payload?.last === "boolean" ? payload.last : page + 1 >= totalPages;
 
   return {
     campaigns: Array.isArray(rawCampaigns) ? rawCampaigns.map(normalizeCampaign) : [],
     page,
     totalPages: Math.max(totalPages, page),
-    total
+    total,
+    last
   };
 }
 

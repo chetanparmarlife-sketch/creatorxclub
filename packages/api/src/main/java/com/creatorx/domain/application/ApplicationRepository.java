@@ -1,5 +1,6 @@
 package com.creatorx.domain.application;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,22 @@ public interface ApplicationRepository extends JpaRepository<Application, UUID> 
     long countByStatusAndCampaignId(
         @Param("status") Application.Status status,
         @Param("campaignId") UUID campaignId
+    );
+
+    Optional<Application> findByCampaignIdAndCreatorId(UUID campaignId, UUID creatorId);
+
+    boolean existsByCampaignIdAndCreatorId(UUID campaignId, UUID creatorId);
+
+    @Query("""
+        select a
+        from Application a
+        where a.creatorId = :creatorId
+          and a.status = :status
+        order by a.createdAt desc
+        """)
+    Page<Application> findByCreatorIdAndStatusOrderByCreatedAtDesc(
+        @Param("creatorId") UUID creatorId,
+        @Param("status") Application.Status status,
+        Pageable pageable
     );
 }

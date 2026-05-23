@@ -4,10 +4,11 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
+public interface CampaignRepository extends JpaRepository<Campaign, UUID>, JpaSpecificationExecutor<Campaign> {
 
     @Query("""
         select c
@@ -47,4 +48,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
         nativeQuery = true
     )
     Page<Campaign> findLiveCampaignsForCreator(@Param("creatorId") UUID creatorId, Pageable pageable);
+
+    long countByBrandId(UUID brandId);
+
+    java.util.List<Campaign> findByBrandId(UUID brandId);
 }

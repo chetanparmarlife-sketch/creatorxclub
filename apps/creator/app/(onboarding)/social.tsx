@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
   platformCard: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.06)",
-    backgroundColor: "#FFFFFF",
+    borderColor: colors.borderGlass,
+    backgroundColor: colors.surfaceSolid,
     padding: 18,
     shadowColor: colors.primary,
     shadowOpacity: 0.06,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 13,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     alignItems: "center",
     justifyContent: "center"
   },
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     gap: 9,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.08)",
+    borderColor: colors.borderGlass,
     backgroundColor: "rgba(91,79,233,0.04)",
     padding: 13,
     marginBottom: 22

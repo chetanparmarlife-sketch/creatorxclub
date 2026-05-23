@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.06)"
   },
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     borderRadius: 24,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     padding: 18,
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     overflow: "hidden"
   },
   fillImage: {
@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
   textAreaShell: {
     minHeight: 150,
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.08)",
     padding: 14
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.08)",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 13
   },
   linkInput: {
@@ -901,7 +901,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.08)",
     paddingHorizontal: 14,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: colors.surfaceSolid
   },
   rupee: {
     color: colors.primary,
@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
   sheet: {
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 22,
     paddingTop: 12,
     paddingBottom: 28

@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.08)",
+    borderColor: colors.borderGlass,
     backgroundColor: "rgba(91,79,233,0.04)",
     padding: 14,
     marginBottom: 18
@@ -259,8 +259,8 @@ const styles = StyleSheet.create({
   uploadCard: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(91,79,233,0.06)",
-    backgroundColor: "#FFFFFF",
+    borderColor: colors.borderGlass,
+    backgroundColor: colors.surfaceSolid,
     padding: 16,
     shadowColor: colors.primary,
     shadowOpacity: 0.06,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 150,
     borderRadius: 12,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceSolid,
     marginBottom: 12
   },
   assetRow: {
@@ -408,6 +408,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: colors.surfaceSolid
   }
 });

@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.06)"
   },
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   avatar: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: colors.borderSoft,
     overflow: "hidden"
@@ -637,7 +637,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.borderSoft,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 10,
     paddingVertical: 7
   },
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
   },
   nicheTag: {
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 10,
     paddingVertical: 7
   },
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     fontWeight: "900"
   },
   payoutCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderRadius: 18,
     padding: 18,
     marginBottom: 22
@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)",
     padding: 13
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
   },
   rightsCard: {
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)",
     padding: 14,
@@ -906,7 +906,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     borderRadius: 14,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)",
     padding: 12
@@ -963,7 +963,7 @@ const styles = StyleSheet.create({
   },
   brandCard: {
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)",
     padding: 15
@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)",
     overflow: "hidden",
@@ -1054,7 +1054,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 7,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)"
   },
@@ -1126,7 +1126,7 @@ const styles = StyleSheet.create({
   kycSheet: {
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     paddingHorizontal: 22,
     paddingTop: 12,
     paddingBottom: 30
@@ -1172,7 +1172,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary
   },
   skeleton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surfaceSolid,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: "rgba(91,79,233,0.05)"
