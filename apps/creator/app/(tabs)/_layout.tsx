@@ -1,11 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import { useUnreadCount } from "@/lib/hooks/useNotifications";
 import { colors } from "@/lib/theme";
 
-const unreadCount = 3;
+const chatUnreadCount = 0;
 
 export default function TabsLayout() {
+  const unreadCount = useUnreadCount();
+  const notificationCount = unreadCount.data?.count ?? 0;
+
   return (
     <Tabs
       screenOptions={{
@@ -24,20 +28,33 @@ export default function TabsLayout() {
         options={{
           title: "Chat",
           tabBarIcon: ({ color, size }) => (
-            <View>
-              <Ionicons name="chatbubble-ellipses-outline" color={color} size={size} />
-              {unreadCount > 0 ? (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{unreadCount}</Text>
-                </View>
-              ) : null}
-            </View>
+            <TabIconWithBadge icon="chatbubble-ellipses-outline" color={color} size={size} count={chatUnreadCount} />
           )
         }}
       />
       <Tabs.Screen name="wallet" options={{ title: "Wallet", tabBarIcon: ({ color, size }) => <Ionicons name="wallet-outline" color={color} size={size} /> }} />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Alerts",
+          tabBarIcon: ({ color, size }) => <TabIconWithBadge icon="notifications-outline" color={color} size={size} count={notificationCount} />
+        }}
+      />
       <Tabs.Screen name="profile" options={{ title: "Profile", tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" color={color} size={size} /> }} />
     </Tabs>
+  );
+}
+
+function TabIconWithBadge({ icon, color, size, count }: { icon: keyof typeof Ionicons.glyphMap; color: string; size: number; count: number }) {
+  return (
+    <View>
+      <Ionicons name={icon} color={color} size={size} />
+      {count > 0 ? (
+        <View style={[styles.badge, count > 9 ? styles.badgeWide : null]}>
+          <Text style={styles.badgeText}>{count > 9 ? "9+" : count}</Text>
+        </View>
+      ) : null}
+    </View>
   );
 }
 
@@ -65,7 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 18
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700"
   },
   badge: {
@@ -79,6 +96,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4
+  },
+  badgeWide: {
+    minWidth: 24
   },
   badgeText: {
     color: "#FFFFFF",
