@@ -42,6 +42,8 @@ export type DeliverableRequirement = {
 export type DeliverableSubmission = {
   id: string;
   contentFiles: string[];
+  captions?: string | null;
+  hashtags?: string[];
   submittedAt?: string | null;
   status: DeliverableStatus;
   revisionNotes?: string | null;
@@ -113,6 +115,52 @@ export function useUpdateShippingAddress() {
   });
 }
 
+export function useDeliverable(deliverableId?: string | null) {
+  return useQuery({
+    queryKey: ["deliverables", deliverableId],
+    enabled: Boolean(deliverableId),
+    staleTime: 30 * 1000,
+    queryFn: async () => {
+      const { data } = await api.get(`/api/deliverables/${deliverableId}`);
+      return normalizeDeliverables(data)[0];
+    }
+  });
+}
+
+export type SubmitDeliverablePayload = {
+  campaignId: string;
+  applicationId?: string;
+  deliverableId?: string | null;
+  contentFiles: string[];
+  captions: string;
+  hashtags: string[];
+  postingInstructions?: string | null;
+};
+
+export function useSubmitDeliverable() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ deliverableId, ...payload }: SubmitDeliverablePayload) => {
+      if (deliverableId) {
+        const { data } = await api.put(`/api/deliverables/${deliverableId}`, {
+          contentFiles: payload.contentFiles,
+          captions: payload.captions,
+          hashtags: payload.hashtags
+        });
+        return data;
+      }
+
+      const { data } = await api.post("/api/deliverables", payload);
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns"] });
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns", variables.campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["deliverables"] });
+    }
+  });
+}
+
 function normalizeActiveCampaign(payload: any): ActiveCampaign {
   const campaign = payload?.campaign ?? payload ?? {};
   const brand = payload?.brand ?? payload?.brandProfile ?? campaign.brand ?? {};
@@ -167,6 +215,8 @@ function normalizeDeliverables(value: unknown): DeliverableSubmission[] {
   return list.map((item: any, index) => ({
     id: String(item.id ?? item.deliverableId ?? index),
     contentFiles: toStringArray(item.contentFiles ?? item.files ?? item.media),
+    captions: item.captions ?? item.caption ?? null,
+    hashtags: toStringArray(item.hashtags),
     submittedAt: item.submittedAt ?? item.createdAt ?? null,
     status: normalizeDeliverableStatus(item.status),
     revisionNotes: item.revisionNotes ?? item.feedback ?? null,
