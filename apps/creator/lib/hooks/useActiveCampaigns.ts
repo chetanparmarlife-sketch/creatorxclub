@@ -85,6 +85,23 @@ export type DigitalContract = {
   brandSignedAt?: string | null;
 };
 
+export type DisputeReason = "QUALITY_ISSUE" | "NON_PAYMENT" | "CONTRACT_BREACH" | "NON_COMPLIANCE" | "OTHER";
+export type DisputeStatus = "OPEN" | "UNDER_REVIEW" | "RESOLVED";
+export type DisputeResolution = "RELEASED_TO_CREATOR" | "REFUNDED_TO_BRAND" | null;
+
+export type DisputeCase = {
+  id: string;
+  campaignId: string;
+  reason: DisputeReason;
+  description?: string | null;
+  evidenceUrls: string[];
+  status: DisputeStatus;
+  adminNotes?: string | null;
+  resolution: DisputeResolution;
+  createdAt?: string | null;
+  resolvedAt?: string | null;
+};
+
 export function useActiveCampaigns() {
   return useQuery({
     queryKey: ["active-campaigns"],
@@ -214,6 +231,37 @@ export function useSignContract() {
   });
 }
 
+export function useExistingDispute(campaignId?: string) {
+  return useQuery({
+    queryKey: ["disputes", "mine", campaignId],
+    enabled: Boolean(campaignId),
+    staleTime: 30 * 1000,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 2;
+    },
+    queryFn: async () => {
+      const { data } = await api.get(`/api/disputes/campaign/${campaignId}/mine`);
+      return normalizeDispute(data);
+    }
+  });
+}
+
+export function useRaiseDispute() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { campaignId: string; applicationId: string; reason: DisputeReason; description: string; evidenceUrls: string[] }) => {
+      const { data } = await api.post("/api/disputes", payload);
+      return normalizeDispute(data);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns"] });
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns", variables.campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["disputes", "mine", variables.campaignId] });
+    }
+  });
+}
+
 function normalizeActiveCampaign(payload: any): ActiveCampaign {
   const campaign = payload?.campaign ?? payload ?? {};
   const brand = payload?.brand ?? payload?.brandProfile ?? campaign.brand ?? {};
@@ -273,6 +321,22 @@ function normalizeContract(payload: any): DigitalContract {
     brandSignature: contract.brandSignature ?? null,
     creatorSignedAt: contract.creatorSignedAt ?? null,
     brandSignedAt: contract.brandSignedAt ?? null
+  };
+}
+
+function normalizeDispute(payload: any): DisputeCase {
+  const dispute = payload?.dispute ?? payload?.case ?? payload ?? {};
+  return {
+    id: String(dispute.id ?? ""),
+    campaignId: String(dispute.campaignId ?? dispute.campaign?.id ?? ""),
+    reason: normalizeDisputeReason(dispute.reason),
+    description: dispute.description ?? dispute.message ?? null,
+    evidenceUrls: toStringArray(dispute.evidenceUrls ?? dispute.evidenceFiles ?? dispute.evidence),
+    status: normalizeDisputeStatus(dispute.status),
+    adminNotes: dispute.adminNotes ?? null,
+    resolution: normalizeDisputeResolution(dispute.resolution),
+    createdAt: dispute.createdAt ?? null,
+    resolvedAt: dispute.resolvedAt ?? null
   };
 }
 
@@ -361,6 +425,24 @@ function normalizeCompensation(value: unknown): CompensationType {
   const type = String(value ?? "CASH").toUpperCase();
   if (type === "GIFTING" || type === "DIGITAL" || type === "MIXED") return type;
   return "CASH";
+}
+
+function normalizeDisputeReason(value: unknown): DisputeReason {
+  const reason = String(value ?? "OTHER").toUpperCase();
+  if (reason === "QUALITY_ISSUE" || reason === "NON_PAYMENT" || reason === "CONTRACT_BREACH" || reason === "NON_COMPLIANCE") return reason;
+  return "OTHER";
+}
+
+function normalizeDisputeStatus(value: unknown): DisputeStatus {
+  const status = String(value ?? "OPEN").toUpperCase();
+  if (status === "UNDER_REVIEW" || status === "RESOLVED") return status;
+  return "OPEN";
+}
+
+function normalizeDisputeResolution(value: unknown): DisputeResolution {
+  const resolution = String(value ?? "").toUpperCase();
+  if (resolution === "RELEASED_TO_CREATOR" || resolution === "REFUNDED_TO_BRAND") return resolution;
+  return null;
 }
 
 function parseJson(value: unknown): any {
