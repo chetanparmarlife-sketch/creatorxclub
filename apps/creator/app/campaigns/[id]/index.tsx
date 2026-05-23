@@ -10,10 +10,10 @@ import {
   DeliverableRequirement,
   InventoryProduct,
   useCampaignDetail,
-  useMyCampaignApplication,
   useSavedCampaigns,
   useToggleSave
 } from "@/lib/hooks/useCampaignDetail";
+import { useMyApplicationForCampaign } from "@/lib/hooks/useApplications";
 import { CompensationType } from "@/lib/hooks/useCampaigns";
 import { colors } from "@/lib/theme";
 import { useAuthStore } from "@/store/auth";
@@ -24,7 +24,7 @@ export default function CampaignDetailRoute() {
   const kycStatus = useAuthStore((state) => state.user?.kycStatus ?? null);
   const detailQuery = useCampaignDetail(campaignId);
   const savedQuery = useSavedCampaigns();
-  const applicationQuery = useMyCampaignApplication(campaignId);
+  const applicationQuery = useMyApplicationForCampaign(campaignId);
   const toggleSave = useToggleSave();
   const [kycModalOpen, setKycModalOpen] = useState(false);
 

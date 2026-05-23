@@ -1,8 +1,7 @@
 import { InfiniteData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { api } from "@/lib/api";
 import { CampaignPage } from "@/lib/hooks/useCampaigns";
-import { CompensationType, ExploreCampaign } from "@/lib/hooks/useCampaigns";
+import { CompensationType } from "@/lib/hooks/useCampaigns";
 import { Platform } from "@/store/onboarding";
 
 export type UsageRights = {
@@ -68,12 +67,6 @@ export type CampaignDetail = {
   pastCampaignExamples: PastCampaignExample[];
 };
 
-export type MyApplication = {
-  id: string;
-  status: string;
-  createdAt?: string | null;
-};
-
 type ToggleSaveVariables = {
   campaignId: string;
   saved: boolean;
@@ -103,28 +96,6 @@ export function useSavedCampaigns() {
     queryFn: async () => {
       const { data } = await api.get("/api/creators/saved-campaigns");
       return normalizeSavedIds(data);
-    }
-  });
-}
-
-export function useMyCampaignApplication(campaignId?: string) {
-  return useQuery<MyApplication | null>({
-    queryKey: ["my-campaign-application", campaignId],
-    enabled: Boolean(campaignId),
-    retry: false,
-    queryFn: async () => {
-      try {
-        const { data } = await api.get(`/api/campaigns/${campaignId}/my-application`);
-        return {
-          id: String(data.id),
-          status: String(data.status ?? "PENDING"),
-          createdAt: data.createdAt ?? data.created_at ?? null
-        };
-      } catch (error) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response?.status === 404) return null;
-        throw error;
-      }
     }
   });
 }
