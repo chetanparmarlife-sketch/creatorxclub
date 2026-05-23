@@ -28,7 +28,7 @@ export type ExploreCampaign = {
   saved: boolean;
 };
 
-type CampaignPage = {
+export type CampaignPage = {
   campaigns: ExploreCampaign[];
   page: number;
   totalPages: number;
