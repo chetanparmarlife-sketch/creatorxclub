@@ -39,6 +39,9 @@ public class DisputeCase {
     @Column(name = "reason", nullable = false)
     private Reason reason;
 
+    @Column(name = "description", nullable = false)
+    private String description;
+
     @Column(name = "evidence", nullable = false, columnDefinition = "jsonb")
     private String evidence;
 

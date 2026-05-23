@@ -1,5 +1,16 @@
 package com.creatorx.domain.creator;
 
+import com.creatorx.domain.application.Application;
+import com.creatorx.domain.application.ApplicationRepository;
+import com.creatorx.domain.brand.Brand;
+import com.creatorx.domain.brand.BrandRepository;
+import com.creatorx.domain.campaign.Campaign;
+import com.creatorx.domain.campaign.CampaignRepository;
+import com.creatorx.domain.contract.ContractMapper;
+import com.creatorx.domain.contract.DigitalContract;
+import com.creatorx.domain.contract.DigitalContractRepository;
+import com.creatorx.domain.creator.dto.ActiveCampaignDetailResponse;
+import com.creatorx.domain.creator.dto.ActiveCampaignSummaryResponse;
 import com.creatorx.domain.creator.dto.CreatorProfileResponse;
 import com.creatorx.domain.creator.dto.KycSubmissionRequest;
 import com.creatorx.domain.creator.dto.KycSubmissionResponse;
@@ -7,6 +18,9 @@ import com.creatorx.domain.creator.dto.ShippingAddressRequest;
 import com.creatorx.domain.creator.dto.ShippingAddressResponse;
 import com.creatorx.domain.creator.dto.SocialAccountRequest;
 import com.creatorx.domain.creator.dto.UpdateProfileRequest;
+import com.creatorx.domain.deliverable.Deliverable;
+import com.creatorx.domain.deliverable.DeliverableMapper;
+import com.creatorx.domain.deliverable.DeliverableRepository;
 import com.creatorx.domain.notification.Notification;
 import com.creatorx.domain.notification.NotificationRepository;
 import com.creatorx.domain.user.User;
@@ -15,8 +29,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +53,13 @@ public class CreatorService {
     private final SocialAccountRepository socialAccountRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final ApplicationRepository applicationRepository;
+    private final CampaignRepository campaignRepository;
+    private final BrandRepository brandRepository;
+    private final DeliverableRepository deliverableRepository;
+    private final DigitalContractRepository contractRepository;
+    private final DeliverableMapper deliverableMapper;
+    private final ContractMapper contractMapper;
     private final CreatorMapper creatorMapper;
     private final ObjectMapper objectMapper;
     private final SecureRandom secureRandom = new SecureRandom();
@@ -151,6 +174,50 @@ public class CreatorService {
         return new ShippingAddressResponse(shippingAddress);
     }
 
+    @Transactional(readOnly = true)
+    public List<ActiveCampaignSummaryResponse> activeCampaigns(UUID creatorId) {
+        return applicationRepository.findByCreatorIdAndStatus(creatorId, Application.Status.APPROVED).stream()
+            .map(this::toActiveSummary)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ActiveCampaignDetailResponse activeCampaignDetail(UUID creatorId, UUID campaignId) {
+        Application application = applicationRepository.findByCampaignIdAndCreatorId(campaignId, creatorId)
+            .filter(app -> app.getStatus() == Application.Status.APPROVED)
+            .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Active campaign not found"));
+        ActiveCampaignSummaryResponse summary = toActiveSummary(application);
+        Campaign campaign = campaignRepository.findById(campaignId)
+            .orElseThrow(() -> new EntityNotFoundException("Campaign not found"));
+        CreatorProfile creator = creatorProfileRepository.findById(creatorId)
+            .orElseThrow(() -> new EntityNotFoundException("Creator not found"));
+        Deliverable deliverable = deliverableRepository.findTopByApplicationIdOrderBySubmittedAtDesc(application.getId()).orElse(null);
+        DigitalContract contract = contractRepository.findByCampaignId(campaignId).orElse(null);
+        return new ActiveCampaignDetailResponse(
+            summary.campaignId(),
+            summary.applicationId(),
+            summary.deliverableId(),
+            summary.title(),
+            summary.brandName(),
+            summary.brandLogoUrl(),
+            summary.compensationType(),
+            summary.deliverableStatus(),
+            summary.slaDeadline(),
+            summary.slaStatus(),
+            summary.productReceiptConfirmed(),
+            summary.campaignStatus(),
+            summary.creatorNetPayout(),
+            campaign.getDescription(),
+            campaign.getDescription(),
+            campaign.getDeliverableRequirements(),
+            deliverable == null ? null : deliverable.getPostingInstructions(),
+            campaign.getSlaTerms(),
+            creator.getShippingAddress(),
+            deliverableMapper.toResponse(deliverable),
+            contract == null ? null : contractMapper.toResponse(contract, campaign)
+        );
+    }
+
     String generateReferralCode() {
         String referralCode;
         do {
@@ -190,6 +257,68 @@ public class CreatorService {
     private CreatorProfileResponse toResponse(CreatorProfile profile) {
         List<SocialAccount> socialAccounts = socialAccountRepository.findByCreatorIdOrderByPlatformAsc(profile.getUserId());
         return creatorMapper.toResponse(profile, socialAccounts);
+    }
+
+    private ActiveCampaignSummaryResponse toActiveSummary(Application application) {
+        Campaign campaign = campaignRepository.findById(application.getCampaignId())
+            .orElseThrow(() -> new EntityNotFoundException("Campaign not found"));
+        Brand brand = brandRepository.findById(campaign.getBrandId())
+            .orElseThrow(() -> new EntityNotFoundException("Brand not found"));
+        Deliverable deliverable = deliverableRepository.findTopByApplicationIdOrderBySubmittedAtDesc(application.getId()).orElse(null);
+        DigitalContract contract = contractRepository.findByCampaignId(campaign.getId()).orElse(null);
+        Instant deadline = deliverable == null ? applicationDeadline(application, campaign) : deliverable.getSlaDeadline();
+        String deliverableStatus = deliverable == null ? "NOT_SUBMITTED" : deliverable.getStatus().name();
+        ActiveCampaignSummaryResponse.CampaignStatus campaignStatus = deliverable != null
+            && deliverable.getStatus() == Deliverable.Status.APPROVED
+            && contract != null
+            && contract.getStatus() == DigitalContract.Status.COMPLETED
+            ? ActiveCampaignSummaryResponse.CampaignStatus.COMPLETED
+            : ActiveCampaignSummaryResponse.CampaignStatus.IN_PROGRESS;
+        return new ActiveCampaignSummaryResponse(
+            campaign.getId(),
+            application.getId(),
+            deliverable == null ? null : deliverable.getId(),
+            campaign.getTitle(),
+            brand.getCompanyName(),
+            null,
+            campaign.getCompensationType(),
+            deliverableStatus,
+            deadline,
+            slaStatus(deadline),
+            deliverable == null ? false : Boolean.TRUE.equals(deliverable.getProductReceiptConfirmed()),
+            campaignStatus,
+            creatorNetPayout(campaign.getCreatorPayout())
+        );
+    }
+
+    private Instant applicationDeadline(Application application, Campaign campaign) {
+        Instant start = application.getUpdatedAt() == null ? application.getCreatedAt() : application.getUpdatedAt();
+        return (start == null ? Instant.now() : start).plus(parseSlaDays(campaign.getSlaTerms()), ChronoUnit.DAYS);
+    }
+
+    private long parseSlaDays(String slaTerms) {
+        if (slaTerms == null) {
+            return 7;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(\\d+)").matcher(slaTerms);
+        return matcher.find() ? Long.parseLong(matcher.group(1)) : 7;
+    }
+
+    private ActiveCampaignSummaryResponse.SlaStatus slaStatus(Instant deadline) {
+        if (deadline == null) {
+            return ActiveCampaignSummaryResponse.SlaStatus.ON_TRACK;
+        }
+        Instant now = Instant.now();
+        if (now.isAfter(deadline)) {
+            return ActiveCampaignSummaryResponse.SlaStatus.BREACHED;
+        }
+        return now.plus(72, ChronoUnit.HOURS).isAfter(deadline)
+            ? ActiveCampaignSummaryResponse.SlaStatus.AT_RISK
+            : ActiveCampaignSummaryResponse.SlaStatus.ON_TRACK;
+    }
+
+    private BigDecimal creatorNetPayout(BigDecimal gross) {
+        return gross == null ? BigDecimal.ZERO : gross.multiply(BigDecimal.valueOf(0.90)).setScale(2, RoundingMode.HALF_UP);
     }
 
     private void validateBudgetRange(BigDecimal min, BigDecimal max) {
@@ -240,3 +369,6 @@ public class CreatorService {
     ) {
     }
 }
+import com.creatorx.domain.deliverable.Deliverable;
+import com.creatorx.domain.deliverable.DeliverableMapper;
+import com.creatorx.domain.deliverable.DeliverableRepository;

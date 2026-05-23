@@ -1,6 +1,8 @@
 package com.creatorx.domain.creator;
 
 import com.creatorx.auth.CurrentUser;
+import com.creatorx.domain.creator.dto.ActiveCampaignDetailResponse;
+import com.creatorx.domain.creator.dto.ActiveCampaignSummaryResponse;
 import com.creatorx.domain.creator.dto.CreatorProfileResponse;
 import com.creatorx.domain.creator.dto.KycSubmissionRequest;
 import com.creatorx.domain.creator.dto.KycSubmissionResponse;
@@ -9,6 +11,8 @@ import com.creatorx.domain.creator.dto.ShippingAddressResponse;
 import com.creatorx.domain.creator.dto.SocialAccountRequest;
 import com.creatorx.domain.creator.dto.UpdateProfileRequest;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,5 +69,17 @@ public class CreatorController {
     @PreAuthorize("hasRole('CREATOR')")
     public ShippingAddressResponse updateShippingAddress(@Valid @RequestBody ShippingAddressRequest request) {
         return creatorService.updateShippingAddress(currentUser.id(), request);
+    }
+
+    @GetMapping("/active-campaigns")
+    @PreAuthorize("hasRole('CREATOR')")
+    public List<ActiveCampaignSummaryResponse> activeCampaigns() {
+        return creatorService.activeCampaigns(currentUser.id());
+    }
+
+    @GetMapping("/active-campaigns/{campaignId}")
+    @PreAuthorize("hasRole('CREATOR')")
+    public ActiveCampaignDetailResponse activeCampaignDetail(@PathVariable UUID campaignId) {
+        return creatorService.activeCampaignDetail(currentUser.id(), campaignId);
     }
 }

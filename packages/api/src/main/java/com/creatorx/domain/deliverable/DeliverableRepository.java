@@ -2,6 +2,7 @@ package com.creatorx.domain.deliverable;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,12 @@ public interface DeliverableRepository extends JpaRepository<Deliverable, UUID> 
         @Param("to") Instant to,
         @Param("status") Deliverable.Status status
     );
+
+    Optional<Deliverable> findByApplicationId(UUID applicationId);
+
+    Optional<Deliverable> findTopByApplicationIdOrderBySubmittedAtDesc(UUID applicationId);
+
+    List<Deliverable> findByCampaignId(UUID campaignId);
+
+    boolean existsByApplicationId(UUID applicationId);
 }
