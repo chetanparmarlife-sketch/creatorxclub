@@ -54,6 +54,7 @@ export type ActiveCampaignDetail = ActiveCampaign & {
   description: string;
   keyRequirements: string[];
   deliverableRequirements: DeliverableRequirement[];
+  usageRights?: UsageRightsSnapshot | null;
   applicationStatus: string;
   shippingAddress?: ShippingAddress | null;
   postingInstructions?: string | null;
@@ -61,6 +62,27 @@ export type ActiveCampaignDetail = ActiveCampaign & {
   creatorPayout: number;
   platformFee: number;
   deliverables: DeliverableSubmission[];
+};
+
+export type UsageRightsSnapshot = {
+  exclusivity?: boolean;
+  exclusive?: boolean;
+  exclusivityPeriod?: string | number | null;
+  duration?: string | null;
+  usageDuration?: string | null;
+  territorialScope?: string | null;
+  scope?: string | null;
+  restrictions?: string[];
+};
+
+export type DigitalContract = {
+  id: string;
+  status: "PENDING" | "COMPLETED";
+  usageRightsSnapshot: UsageRightsSnapshot;
+  creatorSignature?: string | null;
+  brandSignature?: string | null;
+  creatorSignedAt?: string | null;
+  brandSignedAt?: string | null;
 };
 
 export function useActiveCampaigns() {
@@ -161,6 +183,37 @@ export function useSubmitDeliverable() {
   });
 }
 
+export function useContract(campaignId?: string) {
+  return useQuery({
+    queryKey: ["contract", campaignId],
+    enabled: Boolean(campaignId),
+    staleTime: 30 * 1000,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 2;
+    },
+    queryFn: async () => {
+      const { data } = await api.get(`/api/contracts/campaign/${campaignId}`);
+      return normalizeContract(data);
+    }
+  });
+}
+
+export function useSignContract() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ contractId, signature }: { contractId: string; campaignId: string; signature: string }) => {
+      const { data } = await api.post(`/api/contracts/${contractId}/sign/creator`, { signature });
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["contract", variables.campaignId] });
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns"] });
+      queryClient.invalidateQueries({ queryKey: ["active-campaigns", variables.campaignId] });
+    }
+  });
+}
+
 function normalizeActiveCampaign(payload: any): ActiveCampaign {
   const campaign = payload?.campaign ?? payload ?? {};
   const brand = payload?.brand ?? payload?.brandProfile ?? campaign.brand ?? {};
@@ -199,6 +252,7 @@ function normalizeActiveCampaignDetail(payload: any): ActiveCampaignDetail {
     description: String(payload.description ?? campaign.description ?? campaign.brief ?? ""),
     keyRequirements: normalizeRequirements(payload.keyRequirements ?? payload.requirements),
     deliverableRequirements: normalizeRequirementsList(payload.deliverableRequirements ?? campaign.deliverableRequirements),
+    usageRights: normalizeUsageRights(payload.usageRights ?? campaign.usageRights),
     applicationStatus: String(payload.applicationStatus ?? payload.application?.status ?? "APPROVED"),
     shippingAddress: normalizeShippingAddress(payload.shippingAddress),
     postingInstructions: payload.postingInstructions ?? campaign.postingInstructions ?? null,
@@ -206,6 +260,19 @@ function normalizeActiveCampaignDetail(payload: any): ActiveCampaignDetail {
     creatorPayout,
     platformFee,
     deliverables
+  };
+}
+
+function normalizeContract(payload: any): DigitalContract {
+  const contract = payload?.contract ?? payload ?? {};
+  return {
+    id: String(contract.id ?? ""),
+    status: String(contract.status ?? "PENDING").toUpperCase() === "COMPLETED" ? "COMPLETED" : "PENDING",
+    usageRightsSnapshot: normalizeUsageRights(contract.usageRightsSnapshot ?? contract.usageRights ?? {}),
+    creatorSignature: contract.creatorSignature ?? null,
+    brandSignature: contract.brandSignature ?? null,
+    creatorSignedAt: contract.creatorSignedAt ?? null,
+    brandSignedAt: contract.brandSignedAt ?? null
   };
 }
 
@@ -253,6 +320,22 @@ function normalizeShippingAddress(value: unknown): ShippingAddress | null {
     state: String(address.state ?? ""),
     pincode: String(address.pincode ?? address.postalCode ?? ""),
     country: String(address.country ?? "India")
+  };
+}
+
+function normalizeUsageRights(value: unknown): UsageRightsSnapshot {
+  const parsed = parseJson(value);
+  if (!parsed || typeof parsed !== "object") return {};
+  const rights = parsed as any;
+  return {
+    exclusivity: Boolean(rights.exclusivity ?? rights.exclusive),
+    exclusive: Boolean(rights.exclusive ?? rights.exclusivity),
+    exclusivityPeriod: rights.exclusivityPeriod ?? rights.exclusivePeriod ?? null,
+    duration: rights.duration ?? rights.usageDuration ?? null,
+    usageDuration: rights.usageDuration ?? rights.duration ?? null,
+    territorialScope: rights.territorialScope ?? rights.scope ?? null,
+    scope: rights.scope ?? rights.territorialScope ?? null,
+    restrictions: toStringArray(rights.restrictions)
   };
 }
 
